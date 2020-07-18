@@ -1,0 +1,22 @@
+{
+  "name": "hyperhyperspace-home",
+  "version": "0.1.0",
+  "author": "Santiago Bazerque",
+  "license": "MIT",
+  "description": "Home is a library of common use cases for the Hyper Hyper Space.",
+  "main": "dist/index.js",
+  "source": "src/index.ts",
+  "types": "decl/index.d.ts",
+  "private": false,
+  "scripts": {
+    "build": "npx microbundle-crl && npx tsc --declaration --outDir ./decl"
+  },
+  "devDependencies": {
+    "microbundle-crl": "^0.13.11",
+    "typescript": "^3.9.6"
+  },
+  "dependencies": {
+    "jsencrypt": "^3.0.0-rc.1",
+    "tslib": "^2.0.0"
+  }
+}
