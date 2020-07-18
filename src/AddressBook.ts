@@ -4,7 +4,6 @@ import { Account } from './Account';
 import { Contact } from './Contact';
 import { Device } from './Device';
 import { Invite } from './Invite';
-import { ContactNegotiation } from './ContactNegotiation';
 
 
 class AddressBook extends HashedObject {
@@ -15,7 +14,7 @@ class AddressBook extends HashedObject {
     ownDevices? : MutableSet<Device>;
     ownContact? : Contact;
     contacts?: MutableSet<Contact>;
-    invites?: MutableSet<ContactNegotiation>;
+    invites?: MutableSet<Invite>;
 
     // transient variables
     _perContactPeerSource : Map<Hash, PeerSource>;
