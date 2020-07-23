@@ -1,4 +1,4 @@
-import { HashedObject, Identity, Endpoint, Peer } from 'hyper-hyper-space';
+import { HashedObject, Hash, Identity, Endpoint, Peer } from 'hyper-hyper-space';
 
 class Device extends HashedObject {
 
@@ -26,16 +26,17 @@ class Device extends HashedObject {
     }
 
     asPeer(linkupServer: string): Peer {
-        return { endpoint: this.endpoint(linkupServer), identityHash: this.getAuthor()?.hash() };
+        return { endpoint: Device.endpointForDeviceHash(this.hash(), linkupServer), identityHash: this.getAuthor()?.hash() };
     }
 
-    private endpoint(linkupServer: string) {
+    static endpointForDeviceHash(deviceHash: Hash, linkupServer: string) {
         let ep = linkupServer;
         if (!ep.endsWith('/')) {
             ep = ep + '/';
         }
-        return ep + 'device/' + this.hash();
+        return ep + 'device/' + deviceHash;
     }
+
 
     static deviceHashFromEndpoint(ep: Endpoint) {
         let parts = ep.split('/device/');

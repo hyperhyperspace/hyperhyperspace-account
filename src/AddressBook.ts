@@ -1,23 +1,27 @@
-import { Hash, HashedObject, MutableSet, Endpoint, LinkupManager, HashedSet, Identity } from 'hyper-hyper-space';
+import { Hash, HashedObject, MutableSet, Endpoint, LinkupManager, HashedSet, Identity, HashedLiteral, PeerGroupAgent } from 'hyper-hyper-space';
 import { PeerSource, GenericPeerSource } from 'hyper-hyper-space';
 import { Account } from './Account';
 import { Contact } from './Contact';
 import { Device } from './Device';
 import { Invite } from './Invite';
+import { PendingInvite } from './PendingInvite';
 
 
 class AddressBook extends HashedObject {
 
     
-    account?: Account;
-
+    account?    : Account;
     ownDevices? : MutableSet<Device>;
+
     ownContact? : Contact;
-    contacts?: MutableSet<Contact>;
-    invites?: MutableSet<Invite>;
+    contacts?   : MutableSet<Contact>;
+
+    sentInvites?     : MutableSet<PendingInvite>;
+    receivedInvites? : MutableSet<Invite>
 
     // transient variables
     _perContactPeerSource : Map<Hash, PeerSource>;
+    _perInvitePeerSource  : Map<Hash, PeerSource>;
     _doSync = false;
 
     constructor(account?: Account) {
@@ -27,7 +31,10 @@ class AddressBook extends HashedObject {
             this.account = account;
             this.ownDevices = this.account.devices.clone();
             this.addDerivedField('contacts', new MutableSet<Contact>());
-            this.addDerivedField('invites', new MutableSet<Invite>());
+            this.addDerivedField('sentInvites', new MutableSet<Invite>());
+
+            this._perContactPeerSource = new Map();
+            this._perInvitePeerSource  = new Map();
 
             this.init();
         }
@@ -44,14 +51,15 @@ class AddressBook extends HashedObject {
     init() {
 
         this.contacts.onAddition((contact: Contact) => {
-            let peerSource: PeerSource =  this.createPeerSetWithContact(contact);
+            let peerSource: PeerSource =  this.createPeerGroupWithContact(contact);
             this.getMesh().joinPeerGroup(this.contactPeerGroupId(contact.identity.hash()),
                                          this.account._localDevice.asPeer(LinkupManager.defaultLinkupServer),
                                          peerSource);
         });
 
         this.contacts.onDeletion((contact: Contact) => {
-            // TODO
+            // TODO: leavePeerGroup does not exist yet.
+            // this.getMesh().leavePeerGroup(this.contactPeerGroupId(contact.identity.hash()));
         });
 
         
@@ -78,58 +86,28 @@ class AddressBook extends HashedObject {
         return 'hhs-home-' + ids.hash() + '-contact-pair';
     }
 
-    private createPeerSetWithContact(contact: Contact) {
-        return new GenericPeerSource(
-            async () => {
-                let ownDevicePeers = Array.from(this.ownDevices.values())
-                                          .map((d: Device) => 
-                                                    d.asPeer(LinkupManager.defaultLinkupServer));
-                let contactDevicePeers = Array.from(contact.devices.values())
-                                              .map((d: Device) => 
-                                              d.asPeer(LinkupManager.defaultLinkupServer));
-                
-                let allPeers = [];
-                
-                for (let i=0; i<Math.max(ownDevicePeers.length, contactDevicePeers.length); i++) {
-                    if (i<ownDevicePeers.length) {
-                        allPeers.push(ownDevicePeers[i]);
-                    }
-                    if (i<contactDevicePeers.length) {
-                        allPeers.push(contactDevicePeers[i]);
-                    }
-                }
+    private createPeerGroupWithContact(contact: Contact) {
 
-                return allPeers;
-            },
-            async (ep: Endpoint) => {
-
-                let hash = Device.deviceHashFromEndpoint(ep);
-
-                try {
-                    let device = this.ownDevices?.get(hash);
-                    if (device !== undefined) {
-                        return device.asPeer(LinkupManager.defaultLinkupServer);
-                    }
-                } catch (e) {
-                    // log!
-                }
-
-                try {
-                    let device = contact.devices?.get(hash);
-                    if (device !== undefined) {
-                        return device.asPeer(LinkupManager.defaultLinkupServer);
-                    }
-                } catch (e) {
-                    // log!
-                }
-
-                return undefined;
-            }
+        return new GenericPeerSource<Device>(
+            (d: Device) => d.asPeer(LinkupManager.defaultLinkupServer),
+            (ep: Endpoint) => Device.deviceHashFromEndpoint(ep),
+            [this.ownDevices, contact.devices]
         );
     }
 
-    private initContactSyncService(contact: Contact) {
-        
+    private sentInvitePeerGroupId(invite: Invite) {
+        return 'hhs-home-contact-invite-' + invite.getId();
+    }
+
+    private createSentInvitePeerGroup(invite: Invite) {
+
+        let deviceHashes: Map<Hash, HashedLiteral> = invite.devices();
+
+        return new GenericPeerSource<HashedLiteral>(
+            (d: HashedLiteral) => { },
+            (ep: Endpoint) => Device.deviceHashFromEndpoint(ep),
+            [deviceHashes]
+        );
     }
 
 }

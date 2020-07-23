@@ -61,35 +61,13 @@ class Account extends HashedObject {
         this._localDevice = await this.getStore().load(deviceHash) as Device;
 
         // create a PeerSource that will feed all the account's devices into a PeerGroup.
-        this._accountDevicesPeerSource = new GenericPeerSource(
-            async () => {
-                if (this.devices === undefined) {
-                    return [];
-                } else {
-                    let devices = Array.from(this.devices.values());
-                    return devices.map(
-                            (d: Device) => d.asPeer(LinkupManager.defaultLinkupServer)
-                        );
-                }
-            },
-            async (ep: Endpoint) => {
-                try {
-                    let hash = Device.deviceHashFromEndpoint(ep);
-                    let device = this.devices?.get(hash);
-                    if (device !== undefined) {
-                        return device.asPeer(LinkupManager.defaultLinkupServer);
-                    } else {
-                        return undefined;
-                    }
-                } catch (e) {
-                    return undefined;
-                }
-            
-            }
+
+        this._accountDevicesPeerSource = new GenericPeerSource<Device>(
+            (d: Device) => d.asPeer(LinkupManager.defaultLinkupServer),
+            (ep: Endpoint) => Device.deviceHashFromEndpoint(ep),
+            [this.devices]
         );
-
         
-
         this.getMesh().joinPeerGroup(
                             this.accountDevicesPeerGroupId(),
                             this._localDevice.asPeer(LinkupManager.defaultLinkupServer),

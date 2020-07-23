@@ -9,7 +9,8 @@
   "types": "decl/index.d.ts",
   "private": false,
   "scripts": {
-    "build": "npx microbundle-crl && npx tsc --declaration --outDir ./decl"
+    "build": "npx microbundle-crl && npx tsc --declaration --outDir ./decl",
+    "clean": "rm -rf ./decl/* ./dist/*"
   },
   "devDependencies": {
     "microbundle-crl": "^0.13.11",
