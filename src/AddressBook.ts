@@ -103,7 +103,7 @@ class AddressBook extends HashedObject {
         }
     }
 
-    start() {
+    async start() {
 
         // Ask the Account instance to sync the AddressBook copy in the local store  
         // with all the other account devices (so, when we save any changes to the store,
@@ -112,13 +112,13 @@ class AddressBook extends HashedObject {
 
         // Keep our copy of the account devices up to date with the local store.
         // (The Account instance will keep our copy in the store in sync.) 
-        this.ownDevices.loadAndWatchForChanges();
+        await this.ownDevices.loadAndWatchForChanges();
 
         // Load all contacts, create a peer group for each contact using the local mesh
         // so we can sync stuff with them privately, and keep it in sync with any changes
         // in the local store to the contacts set.
 
-        this.contacts.loadAllChanges();
+        await this.contacts.loadAllChanges();
 
         for (const contact of this.contacts.values()) {
             this._createContactSyncGroup(contact);
@@ -134,7 +134,7 @@ class AddressBook extends HashedObject {
 
 
         // Also create sync groups for sent invites.
-        this.sentInvites.loadAllChanges();
+        await this.sentInvites.loadAllChanges();
         
         for (const pendingInvite of this.sentInvites.values()) {
             this._createInviteSyncGroup(pendingInvite.invite, true);
@@ -149,7 +149,7 @@ class AddressBook extends HashedObject {
 
         this.sentInvites.watchForChanges(true);
 
-        this.receivedInvites.loadAllChanges();
+        await this.receivedInvites.loadAllChanges();
 
         for (const invite of this.receivedInvites.values()) {
             this._createInviteSyncGroup(invite, false);
