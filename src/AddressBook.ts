@@ -35,7 +35,7 @@ class AddressBook extends HashedObject {
             this.account = account;
             this.ownDevices = this.account.devices.clone();
             this.addDerivedField('contacts', new MutableSet<Contact>());
-            this.addDerivedField('sentInvites', new MutableSet<Invite>());
+            this.addDerivedField('sentInvites', new MutableSet<PendingInvite>());
             this.addDerivedField('receivedInvites', new MutableSet<Invite>());
 
             this._perContactPeerSource = new Map();
