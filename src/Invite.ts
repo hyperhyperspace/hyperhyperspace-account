@@ -5,7 +5,8 @@ import { Device } from './Device';
 
 type CompactInvite = { s: string, id: Hash, inf: any, d: Array<Hash> };
 
-const RCV_INTRO = 'invite-receiver-identity';
+const RCV_PREFIX = 'invite-receiver-identity';
+const SND_PREFIX = 'invite-sender-device';
 
 class Invite extends HashedObject {
 
@@ -70,7 +71,7 @@ class Invite extends HashedObject {
         if (!ep.endsWith('/')) {
             ep = ep + '/';
         }
-        ep = ep + 'invite-sender-device/' + deviceHash
+        ep = ep + SND_PREFIX + '/' + deviceHash
         return {identityHash: this.sender, endpoint: Device.endpointForDeviceHash(deviceHash.value, linkupServer)}
     }
 
@@ -92,7 +93,7 @@ class Invite extends HashedObject {
         let encIdentity = new ChaCha20Impl().encryptHex(receiverIdentity, key, nonce);
         let hmac = new HMACImpl().hmacSHA256hex(receiverIdentity, key);
 
-        ep = ep + RCV_INTRO + '/' + encIdentity + '/' + nonce + '/' + hmac;
+        ep = ep + RCV_PREFIX + '/' + encIdentity + '/' + nonce + '/' + hmac;
 
         return { identityHash: receiverIdentity, endpoint: ep};
     }
@@ -108,7 +109,7 @@ class Invite extends HashedObject {
             const encId = parts[l-3];
             const intro = parts[l-4];
 
-            if (intro === RCV_INTRO) {
+            if (intro === RCV_PREFIX) {
                 let id: Hash;
                 try {
                     const key = this.deriveChaCha20Key();
@@ -127,6 +128,8 @@ class Invite extends HashedObject {
     }
 
     private deriveChaCha20Key() : string {
+
+        // TODO: do something clever.
 
         const CHACHA_KEY_NIBBLES  = 256 / 4;
         const secret = this.getId();

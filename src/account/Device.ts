@@ -1,4 +1,7 @@
-import { HashedObject, Hash, Identity, Endpoint, Peer } from 'hyper-hyper-space';
+import { HashedObject, Hash, Identity, Endpoint, Peer, PeerInfo, MutableSet, LinkupManager } from 'hyper-hyper-space';
+
+import { LinkupServer } from './LinkupServer';
+import { AccountInfo } from './AccountInfo';
 
 class Device extends HashedObject {
 
@@ -6,9 +9,9 @@ class Device extends HashedObject {
 
     constructor(owner?: Identity) {
         super();
-        this.setRandomId();
         if (owner !== undefined) {
             this.setAuthor(owner);
+            this.setRandomId();
         }
     }
 
@@ -25,8 +28,12 @@ class Device extends HashedObject {
         return this.getAuthor() !== undefined;
     }
 
-    asPeer(linkupServer: string): Peer {
+    asPeer(linkupServer: string): PeerInfo {
         return { endpoint: Device.endpointForDeviceHash(this.hash(), linkupServer), identityHash: this.getAuthor()?.hash() };
+    }
+
+    async initFromEndpoint(ep: Endpoint) {
+
     }
 
     static endpointForDeviceHash(deviceHash: Hash, linkupServer: string) {

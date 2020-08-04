@@ -8,7 +8,6 @@ import { PendingInvite } from './PendingInvite';
 
 
 class AddressBook extends HashedObject {
-
     
     account?    : Account;
     ownDevices? : MutableSet<Device>;
