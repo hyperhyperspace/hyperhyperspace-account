@@ -1,8 +1,5 @@
 import { HashedObject, Hash, Identity, Endpoint, Peer, PeerInfo, MutableSet, LinkupManager } from 'hyper-hyper-space';
 
-import { LinkupServer } from './LinkupServer';
-import { AccountInfo } from './AccountInfo';
-
 class Device extends HashedObject {
 
     static className = 'hhs-home/v0/Device';
