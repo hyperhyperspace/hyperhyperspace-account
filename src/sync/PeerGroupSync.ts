@@ -33,7 +33,7 @@ class PeerGroupSync {
         }
     }
 
-    addTarget(target: SyncTarget) {
+    addSyncTarget(target: SyncTarget) {
         this.targets.push(target);
         if (this.peerGroup !== undefined) {
             this.syncObjects(target.getRootObjects());

@@ -75,14 +75,17 @@ class AccountDevices extends PeerGroupSync implements SyncTarget {
         return this.namespace.getAll();
     }
 
-    async loadAndWatchForLocalChanges() {
+    async localSync() {
         await this.devices.loadAndWatchForChanges();
         await this.linkupServers.loadAndWatchForChanges();
     }
 
-    async loadAndSync() {
+    async remoteSync() {
+
+        this.localSync();
 
         if (this.peerGroup === undefined) {
+
             const peerGroupId = 'hhs-home-' + this.owner?.hash() + '-devices';
 
             let peerGroup = {

@@ -24,7 +24,8 @@ class ContactPairDevices extends PeerGroupSync {
 
     async init(resources: Resources) {
         if (this.resources === undefined) {
-            this.resources = resources;
+            
+            await super.init(resources);
 
             this.contact = await resources.store.load(this.contactIdentityHash);
 
@@ -32,11 +33,11 @@ class ContactPairDevices extends PeerGroupSync {
         }
     }
 
-    async loadAndWatchForLocalChanges() {
-        this.contactAccountDevices.loadAndWatchForLocalChanges();
+    async localSync() {
+        this.contactAccountDevices.localSync();
     }
 
-    async loadAndSync() {
+    async remoteSync() {
 
         if (this.peerGroup === undefined) {
             let identityHashes = [this.ownAccountDevices.ownerIdentityHash, 

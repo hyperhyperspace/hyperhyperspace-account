@@ -1,5 +1,5 @@
 import { Resources, Store, IdbBackend, Mesh, Hash, Identity } from 'hyper-hyper-space';
-import { Device } from './Device';
+import { Device } from './account/Device';
 
 
 class BrowserResources {
