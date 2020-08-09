@@ -24,6 +24,7 @@ class LinkupServer extends HashedObject {
     }
 
     validate(references: Map<string, HashedObject>): boolean {
+        references;
         return this.url !== undefined && this.url.toLowerCase().startsWith('http');
     }
     

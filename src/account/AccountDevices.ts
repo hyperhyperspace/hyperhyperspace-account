@@ -72,12 +72,12 @@ class AccountDevices extends PeerGroupSync implements SyncTarget {
     }
 
     getRootObjects(): IterableIterator<MutableObject> {
-        return this.namespace.getAll();
+        return (this.namespace as Namespace).getAll();
     }
 
     async localSync() {
-        await this.devices.loadAndWatchForChanges();
-        await this.linkupServers.loadAndWatchForChanges();
+        await this.getDevices().loadAndWatchForChanges();
+        await this.getLinkupServers().loadAndWatchForChanges();
     }
 
     async remoteSync() {
@@ -106,17 +106,25 @@ class AccountDevices extends PeerGroupSync implements SyncTarget {
         return localDevice.asPeer(this.getLinkupServer());
     }
 
+    getDevices() : MutableSet<Device> {
+        return this.devices as MutableSet<Device>;
+    }
+
+    getLinkupServers() : MutableSet<LinkupServer> {
+        return this.linkupServers as MutableSet<LinkupServer>;
+    }
+
     getAccountDevicePeerSource() : PeerSource {
         return new AccountDevicePeers(this);
     }
 
     getLinkupServer(): string {
-        let linkupServers = Array.from(this.linkupServers.values());
+        let linkupServers = Array.from(this.getLinkupServers().values());
 
         let linkupServer = LinkupManager.defaultLinkupServer;
 
         if (linkupServers.length > 0) {
-            linkupServer = linkupServers.sort()[0].url;
+            linkupServer = linkupServers.sort()[0].url as string;
         }
 
         return linkupServer;
@@ -133,7 +141,7 @@ class AccountDevicePeers implements PeerSource {
 
     async getPeers(count: number): Promise<PeerInfo[]> {
         
-        let devices = Array.from(this.accountInfo.devices.values());
+        let devices = Array.from(this.accountInfo.getDevices().values());
         Shuffle.array(devices);
 
         if (devices.length > count) {
@@ -147,7 +155,7 @@ class AccountDevicePeers implements PeerSource {
     async getPeerForEndpoint(endpoint: string): Promise<PeerInfo | undefined> {
         let hash = Device.deviceHashFromEndpoint(endpoint);
 
-        let device = this.accountInfo.devices.get(hash);
+        let device = this.accountInfo.getDevices().get(hash);
 
         let pi = undefined;
 

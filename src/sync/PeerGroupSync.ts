@@ -41,7 +41,7 @@ class PeerGroupSync {
     }
 
     private syncObjects(muts: IterableIterator<MutableObject>) {
-        this.resources?.mesh.syncManyObjectsWithPeerGroup(this.peerGroup.id, muts);
+        this.resources?.mesh.syncManyObjectsWithPeerGroup(this.peerGroup?.id, muts);
     }
 
 

@@ -1,4 +1,4 @@
-import { HashedObject, Hash, Identity, Endpoint, Peer, PeerInfo, MutableSet, LinkupManager } from 'hyper-hyper-space';
+import { HashedObject, Hash, Identity, Endpoint, PeerInfo } from 'hyper-hyper-space';
 
 class Device extends HashedObject {
 
@@ -29,9 +29,11 @@ class Device extends HashedObject {
         return { endpoint: Device.endpointForDeviceHash(this.hash(), linkupServer), identityHash: this.getAuthor()?.hash() };
     }
 
+    /*
     async initFromEndpoint(ep: Endpoint) {
 
     }
+    */
 
     static endpointForDeviceHash(deviceHash: Hash, linkupServer: string) {
         let ep = linkupServer;
