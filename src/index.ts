@@ -1,3 +1,3 @@
 export * from './account/AccountDevices';
-export * from './account/Device';
-export * from './account/LinkupServer';
+export * from './account/data/Device';
+export * from './account/data/LinkupServer';

@@ -1,14 +1,14 @@
 import { MutableObject, MutableReference, Namespace, Resources, Identity, PeerSource, PeerInfo, Endpoint, Hash, HMACImpl } from 'hyper-hyper-space';
 
-import { PeerGroupSync } from '../sync/PeerGroupSync';
-import { SyncTarget } from '../sync/SyncTarget';
+import { PeerGroup } from '../sync/PeerGroup';
+import { SharedNamespace } from '../sync/SharedNamespace';
 
-import { Device } from '../account/Device';
+import { Device } from '../account/data/Device';
 
 import { InviteToken } from './InviteToken';
 import { InviteReply } from './InviteReply';
 
-class PendingInviteDevices extends PeerGroupSync implements SyncTarget {
+class PendingInviteDevices extends PeerGroup implements SharedNamespace {
 
     inviteToken: InviteToken;
 
@@ -40,8 +40,12 @@ class PendingInviteDevices extends PeerGroupSync implements SyncTarget {
     } 
 
 
-    getRootObjects(): IterableIterator<MutableObject> {
+    getAllObjects(): IterableIterator<MutableObject> {
         return this.namespace.getAll();
+    }
+
+    get(key: string): MutableObject | undefined {
+        return this.namespace.get(key);
     }
 
     async localSync() {

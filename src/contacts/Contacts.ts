@@ -3,11 +3,42 @@ import { MutableSet, Hash, Identity, Namespace, Resources, MutableObject } from 
 import { AccountDevices } from '../account/AccountDevices';
 
 import { ContactPairDevices } from './ContactPairDevices';
-import { SyncTarget } from '../sync/SyncTarget';
+import { SyncTarget } from '../sync/SharedNamespace';
 import { Invite } from './Invite';
 import { InviteToken } from './InviteToken';
 import { PendingInviteDevices } from './PendingInviteDevices';
+import { InviteReply } from './InviteReply';
 
+enum ContactsEventType {
+    
+    NewInviteSent     = 'new-invite-sent',
+    NewInviteReceived = 'new-invite-received',
+    NewInviteAccepted = 'new-invite-accepted',
+    NewContact        = 'new-contact'
+};
+
+type ContactsEvent = NewContactEvent | NewInviteSentEvent | NewInviteReceivedEvent;
+
+type NewInviteSentEvent = {
+    type: ContactsEventType.NewInviteSent,
+    invite: Invite
+}
+
+type NewInviteReceivedEvent = {
+    type: ContactsEventType.NewInviteReceived,
+    inviteToken: InviteToken
+}
+
+type NewInviteAcceptedEvent = {
+    type: ContactsEventType.NewInviteAccepted,
+    inviteToken: InviteToken,
+    inviteReply: InviteReply
+}
+
+type NewContactEvent = {
+    type: ContactsEventType.NewContact,
+    Identity: Identity
+}
 
 class Contacts implements SyncTarget {
 
@@ -56,12 +87,44 @@ class Contacts implements SyncTarget {
             this.namespace.define('receivedInviteTokens', this.receivedInviteTokens);
             this.receivedInviteTokens.setResources(resources);
 
+
+
             this.ownAccountDevices.addSyncTarget(this);
         }
     }
 
     getRootObjects(): IterableIterator<MutableObject> {
         return this.namespace.getAll();
+    }
+
+    getContacts(sortFn? : (a: Identity, b: Identity) => number) : Identity[] {
+        let contacts = Array.from(this.getContacts().values());
+
+        if (sortFn === undefined) {
+            sortFn = (a: Identity, b: Identity) => {
+                
+                const aHasName = typeof(a.info?.name) === 'string';
+                const bHasName = typeof(b.info?.name) === 'string';
+
+                if ( !aHasName && !bHasName) {
+                    return 0;
+                } else if (!aHasName) {
+                    return -1;
+                } else if (!bHasName) {
+                    return 1;
+                } else {
+
+                    const aName = a.info?.name as string;
+                    const bName = b.info?.name as string;
+
+                    return aName.localeCompare(bName);
+                }
+            }
+        }
+
+        contacts.sort(sortFn)
+
+        return contacts;
     }
 
     async localSync() {
@@ -73,15 +136,19 @@ class Contacts implements SyncTarget {
 
     async remoteSync() {
 
+        // Sync info shared with contacts:
+        await this.remoteSyncWithAllContacts();
+
+        // Sync new contact negotiation info:
+        await this.remoteSyncInvitesWithAllRecipients();      // <-- sent invites
+        await this.remoteSyncAcceptedInvitesWithAllSenders(); // <-- received invites
+                                                              //     (if accepted)
+
+        // Sync own contacts info with all of this account devices:
         this.ownAccountDevices.addSyncTarget(this);
-
-        await this.remoteSyncWithContacts();
-
-        await this.remoteSyncInvitesWithRecipients();
-        await this.remoteSyncAcceptedInvitesWithSenders();
     }
 
-    private async remoteSyncWithContacts() {
+    private async remoteSyncWithAllContacts() {
 
         this.contacts.watchForChanges(false);
 
@@ -112,14 +179,14 @@ class Contacts implements SyncTarget {
         }
     }
 
-    private async remoteSyncInvitesWithRecipients() {
+    private async remoteSyncInvitesWithAllRecipients() {
 
         this.sentInvites.watchForChanges(false);
 
         await this.sentInvites.loadAllChanges();
 
         this.sentInvites.onAddition((invite: Invite) => {
-            this.waitForInviteReply(invite);
+            this.remoteSyncInviteWithRecipient(invite);
         });
 
         this.sentInvites.onDeletion((invite: Invite) => {
@@ -127,13 +194,13 @@ class Contacts implements SyncTarget {
         });
 
         for (const invite of this.sentInvites.values()) {
-            this.waitForInviteReply(invite);
+            this.remoteSyncInviteWithRecipient(invite);
         }
 
         this.sentInvites.watchForChanges(true);
     }
 
-    private waitForInviteReply(invite: Invite) {
+    private remoteSyncInviteWithRecipient(invite: Invite) {
         let inviteHash = invite.hash();
 
         if (!this.pendingSentInviteDevices.has(inviteHash)) {
@@ -146,7 +213,7 @@ class Contacts implements SyncTarget {
         
     }
 
-    private async remoteSyncAcceptedInvitesWithSenders() {
+    private async remoteSyncAcceptedInvitesWithAllSenders() {
         await this.receivedInviteTokens.loadAllChanges();
         
         this.receivedInviteTokens.onAddition((token: InviteToken) => {
@@ -158,7 +225,7 @@ class Contacts implements SyncTarget {
         });
 
         this.sentInvites.onAddition((invite: Invite) => {
-            this.waitForInviteReply(invite);
+            this.remoteSyncInviteWithRecipient(invite);
         });
 
         this.sentInvites.onDeletion((invite: Invite) => {
@@ -166,7 +233,7 @@ class Contacts implements SyncTarget {
         });
 
         for (const invite of this.sentInvites.values()) {
-            this.waitForInviteReply(invite);
+            this.remoteSyncInviteWithRecipient(invite);
         }
     }
 

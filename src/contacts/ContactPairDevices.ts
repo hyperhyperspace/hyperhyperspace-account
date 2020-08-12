@@ -1,10 +1,10 @@
-import { Hash, Namespace, Resources, Identity, PeerGroup, PeerInfo, PeerSource, JoinPeerSources, MutableObject } from 'hyper-hyper-space';
+import { Hash, Namespace, Resources, Identity, PeerGroupInfo, PeerInfo, PeerSource, JoinPeerSources, MutableObject } from 'hyper-hyper-space';
 import { AccountDevices } from '../account/AccountDevices';
-import { PeerGroupSync } from '../sync/PeerGroupSync';
+import { PeerGroup } from '../sync/PeerGroup';
 
 
 
-class ContactPairDevices extends PeerGroupSync {
+class ContactPairDevices extends PeerGroup {
 
     ownAccountDevices: AccountDevices;
 
@@ -39,7 +39,7 @@ class ContactPairDevices extends PeerGroupSync {
 
     async remoteSync() {
 
-        if (this.peerGroup === undefined) {
+        if (this.peerGroupInfo === undefined) {
             let identityHashes = [this.ownAccountDevices.ownerIdentityHash, 
                                   this.contactIdentityHash];
 
@@ -49,7 +49,7 @@ class ContactPairDevices extends PeerGroupSync {
                         identityHashes[0] + '-' + 
                         identityHashes[1] + '-devices';
 
-            let peerGroup = {
+            let peerGroupInfo = {
                 id:         peerGroupId,
                 localPeer:  await this.ownAccountDevices.getLocalDevicePeer(),
                 peerSource: new JoinPeerSources([
@@ -58,7 +58,7 @@ class ContactPairDevices extends PeerGroupSync {
                         ])
             };
 
-            super.sync(peerGroup);
+            super.sync(peerGroupInfo);
             this.addSyncTarget(this.ownAccountDevices);
             this.addSyncTarget(this.contactAccountDevices);
         }

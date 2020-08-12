@@ -3,7 +3,7 @@ import { HashedObject } from 'hyper-hyper-space';
 
 class LinkupServer extends HashedObject {
 
-    static className = 'hhs-home/v0/LinkupServer';
+    static className = 'hhs-home/v0/data/LinkupServer';
 
     url?: string;
 

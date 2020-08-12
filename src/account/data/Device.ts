@@ -2,7 +2,7 @@ import { HashedObject, Hash, Identity, Endpoint, PeerInfo } from 'hyper-hyper-sp
 
 class Device extends HashedObject {
 
-    static className = 'hhs-home/v0/Device';
+    static className = 'hhs-home/v0/data/Device';
 
     constructor(owner?: Identity) {
         super();

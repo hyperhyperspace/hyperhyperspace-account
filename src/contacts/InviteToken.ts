@@ -1,5 +1,5 @@
 import { Hash, HashedObject, HashedSet, HashReference, Identity, RNGImpl, PeerInfo, Endpoint } from 'hyper-hyper-space';
-import { Device } from '../account/Device';
+import { Device } from '../account/data/Device';
 
 const BITS_FOR_SECRET = 32;
 
