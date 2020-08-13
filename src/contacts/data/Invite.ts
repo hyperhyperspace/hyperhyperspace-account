@@ -1,5 +1,5 @@
 import { HashedObject, Hash, Identity, HashReference, HashedSet, RNGImpl } from 'hyper-hyper-space';
-import { Device } from '../account/data/Device';
+import { Device } from '../../account/data/Device';
 import { InviteToken } from './InviteToken';
 
 

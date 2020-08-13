@@ -1,5 +1,5 @@
-import { Hash, HashedObject, HashedSet, HashReference, Identity, RNGImpl, PeerInfo, Endpoint } from 'hyper-hyper-space';
-import { Device } from '../account/data/Device';
+import { Hash, HashedObject, HashedSet, HashReference, Identity, RNGImpl, PeerInfo, HMACImpl, Endpoint } from 'hyper-hyper-space';
+import { Device } from '../../account/data/Device';
 
 const BITS_FOR_SECRET = 32;
 
@@ -60,6 +60,70 @@ class InviteToken extends HashedObject {
     getClassName(): string {
         return InviteToken.className;
     }
+
+    getSenderPeers() : PeerInfo[] {
+        let peers: PeerInfo[] = [];
+
+        for (const deviceRef of this.senderDevices.values()) {
+            let ep = Device.endpointForDeviceHash(deviceRef.hash, this.senderLinkup);
+        }
+
+        return peers;
+    }
+
+    parseSenderEndpoint(ep: Endpoint) : PeerInfo | undefined {
+
+        let deviceHash: Hash | undefined = undefined;
+        let pi: PeerInfo | undefined = undefined;
+
+        try {
+            deviceHash = Device.deviceHashFromEndpoint(ep);
+        } catch(e) {
+            // no luck.
+        }
+
+        if (deviceHash !== undefined) {
+            let deviceRef = new HashReference(deviceHash, Device.className);
+            if (this.senderDevices.has(deviceRef)) {
+                pi = { endpoint: Device.endpointForDeviceHash(deviceHash, this.senderLinkup), identityHash: this.senderIdentityHash }
+            }
+        }
+
+        return pi;
+        
+    }
+
+    getReceiverPeer(receiverIdentity: Identity) : PeerInfo {
+        let ep = this.senderLinkup;
+        if (!ep.endsWith('/')) {
+            ep = ep + '/';
+        }
+
+        const receiverIdentityHash = receiverIdentity.hash();
+        ep = ep + 'invite-reply/' + receiverIdentityHash + '/' + new HMACImpl().hmacSHA256hex(receiverIdentityHash, this.secret);
+
+        return { endpoint: ep, identityHash: receiverIdentityHash};
+    }
+
+    parseReceiverPeer(ep: Endpoint) : PeerInfo | undefined {
+        let parts = ep.split('/invite-reply/');
+        if (parts.length !== 2) {
+            return undefined;
+        }
+
+        parts = parts[1].split('/');
+
+        if (parts.length !== 2) {
+            return undefined;
+        }
+
+        if (parts[1] === new HMACImpl().hmacSHA256hex(parts[0], this.secret)) {
+            return { endpoint: ep, identityHash: parts[0] }
+        } else {
+            return undefined;
+        }
+    }
+    
 }
 
 HashedObject.registerClass(InviteToken.className, InviteToken);

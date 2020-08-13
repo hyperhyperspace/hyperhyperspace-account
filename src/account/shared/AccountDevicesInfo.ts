@@ -6,7 +6,7 @@ import { Device } from '../data/Device';
 import { LinkupServer } from '../data/LinkupServer';
 
 
-class SharedDeviceInfo implements SharedNamespace {
+class AccountDevicesInfo implements SharedNamespace {
 
     ownerIdentityHash: Hash;
 
@@ -21,13 +21,13 @@ class SharedDeviceInfo implements SharedNamespace {
         this.namespace = new Namespace('account-devices-for-' + this.ownerIdentityHash); 
     }
 
-    id() {
+    id(): string {
         return this.namespace.id;
     }
 
     async init(resources: Resources) {
 
-        let owner = await resources.store.load(this.ownerIdentityHash) as (Identity | undefined);
+        let owner = await resources.store.load(this.ownerIdentityHash) as Identity | undefined;
 
         if (owner === undefined) {
             throw new Error('Cannot initialize account shared namespace, owner identity is not present in the store!');
@@ -54,7 +54,7 @@ class SharedDeviceInfo implements SharedNamespace {
 
     getDevices() {
         if (this.devices === undefined) {
-            throw new Error('SharedDeviceInfo has not been initialized: devices is undefined.');
+            throw new Error('AccountDevicesInfo has not been initialized: devices is undefined.');
         } else {
             return this.devices;
         }
@@ -62,7 +62,7 @@ class SharedDeviceInfo implements SharedNamespace {
 
     getLinkupServers() {
         if (this.linkupServers === undefined) {
-            throw new Error('SharedDeviceInfo has not been initialized: linkupServers is undefined.');
+            throw new Error('AccountDevicesInfo has not been initialized: linkupServers is undefined.');
         } else {
              return this.linkupServers;
         }
@@ -70,4 +70,4 @@ class SharedDeviceInfo implements SharedNamespace {
     
 }
 
-export { SharedDeviceInfo };
+export { AccountDevicesInfo };

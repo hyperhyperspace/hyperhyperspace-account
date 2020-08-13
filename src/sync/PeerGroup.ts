@@ -1,4 +1,4 @@
-import { PeerGroupInfo, Resources, Mesh } from 'hyper-hyper-space';
+import { PeerGroupInfo, Resources, Mesh, PeerInfo, PeerSource } from 'hyper-hyper-space';
 import { SharedNamespace } from './SharedNamespace';
 
 
@@ -13,15 +13,32 @@ abstract class PeerGroup {
         this.connected = false;
     }
 
-    abstract getPeerGroupInfo(): PeerGroupInfo;
     abstract getResources(): Resources;
 
-    connect() {    
-        this.getResources().mesh.joinPeerGroup(this.getPeerGroupInfo());
+    abstract getPeerGroupId(): string;
+    abstract getLocalPeer(): Promise<PeerInfo>;
+    abstract getPeerSource(): Promise<PeerSource>;
 
-        for (const namespace of this.namespaces.values()) {
-            this.syncNamespace(namespace);
+    async getPeerGroupInfo(): Promise<PeerGroupInfo> {
+        return {
+            id         : this.getPeerGroupId(),
+            localPeer  : await this.getLocalPeer(),
+            peerSource : await this.getPeerSource()
+        };
+    }
+
+    connect() {   
+        
+        if (!this.connected) {
+            this.getResources().mesh.joinPeerGroup(this.getPeerGroupInfo());
+
+            for (const namespace of this.namespaces.values()) {
+                this.syncNamespace(namespace);
+            }
+
+            this.connected = true;
         }
+
     }
 
     addSyncTarget(namespace: SharedNamespace) {
@@ -36,7 +53,7 @@ abstract class PeerGroup {
 
     private syncNamespace(namespace: SharedNamespace) {
         let mesh = this.getResources().mesh; 
-        mesh.syncManyObjectsWithPeerGroup(this.getPeerGroupInfo().id, namespace.getAllObjects());
+        mesh.syncManyObjectsWithPeerGroup(this.getPeerGroupId(), namespace.getAllObjects());
     }
 
 

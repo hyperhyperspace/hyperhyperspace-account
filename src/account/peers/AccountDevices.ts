@@ -1,73 +1,78 @@
 import { Hash, PeerGroupInfo, Resources, Identity, PeerInfo, MutableSet, SharedNamespace, LinkupManager, PeerSource, Shuffle } from 'hyper-hyper-space';
 import { PeerGroup } from '../../sync/PeerGroup';
 
-import { SharedDeviceInfo } from '../shared/SharedDeviceInfo';
+import { AccountDevicesInfo } from '../shared/AccountDevicesInfo';
 
 import { Device } from '../data/Device';
 
 
-class DevicesPeerGroup extends PeerGroup {
+class AccountDevices extends PeerGroup {
 
 
-    ownerIdentityHash?: Hash;
+    ownerIdentityHash: Hash;
+
+    localDeviceHash?: Hash;
 
     resources?: Resources;
-    peerGroupInfo?: PeerGroupInfo;
 
-    deviceInfo?: SharedDeviceInfo;
+    deviceInfo?: AccountDevicesInfo;
 
-    constructor() {
+    peerGroupId : string;
+    peerSource?  : PeerSource;
+
+    constructor(ownerIdentityHash: Hash, localDeviceHash?: Hash) {
         super();
+
+        this.ownerIdentityHash = ownerIdentityHash;
+        this.peerGroupId = 'hhs-home-' + this.ownerIdentityHash + '-device-group';
+
+        this.localDeviceHash   = localDeviceHash;    // only if there's a local peer !
     }
 
     async init(resources: Resources) {
         this.resources = resources;
 
-        const localPeer  = await this.getLocalDevicePeer();
-        const peerSource = this.getAccountDevicesPeerSource();
+        
+        //this.ownerIdentityHash = localPeer.identityHash;
 
-        this.ownerIdentityHash = localPeer.identityHash;
-
-        this.deviceInfo = new SharedDeviceInfo(this.ownerIdentityHash);
+        this.deviceInfo = new AccountDevicesInfo(this.ownerIdentityHash);
 
         this.deviceInfo.init(resources);
  
         await this.deviceInfo.getDevices().loadAndWatchForChanges();
         await this.deviceInfo.getLinkupServers().loadAndWatchForChanges();
-
-        const peerGroupId = 'hhs-home-' + this.ownerIdentityHash + '-device-group';
-
-        this.peerGroupInfo = {
-            id:         peerGroupId,
-            localPeer:  localPeer,
-            peerSource: peerSource
-        };
-
+        
+        this.peerSource = new AccountDevicePeers(this);
     }
 
     getResources(): Resources {
 
         if (this.resources === undefined) {
-            throw new Error('DevicesPeerGroup has not been initialized: resources is undefined.');
+            throw new Error('AccountDevices has not been initialized: resources is undefined.');
         } else {
             return this.resources;
         }
         
     }
 
-    getPeerGroupInfo(): PeerGroupInfo {
-        
-        if (this.peerGroupInfo === undefined) {
-            throw new Error('DevicesPeerGroup has not been initialized: peerGroupInfo is undefined.');
-        } else {
-            return this.peerGroupInfo;
-        }
+    getPeerGroupId() : string {
+        return this.peerGroupId;
     }
 
-    async getLocalDevicePeer(): Promise<PeerInfo> {
-        const deviceHash = this.getResources().config.deviceHash;
-        const localDevice = await this.getResources().store.load(deviceHash) as Device;
+    async getLocalPeer(): Promise<PeerInfo> {
+        
+        if (this.resources === undefined) {
+            throw new Error('AccountDevices has not been initialized: localDevicePeer is undefined.');
+        } else if (this.localDeviceHash === undefined) {
+            throw new Error('This AccountDevices instance does not have a configured local device: localPeer is undefined.');
+        }
+
+        const localDevice = await this.getResources().store.load(this.localDeviceHash) as Device;
         return localDevice.asPeer(this.getLinkupServer());
+    }
+    
+    async getPeerSource() : Promise<PeerSource> {
+        return this.peerSource;
     }
 
     getLinkupServer(): string {
@@ -81,19 +86,13 @@ class DevicesPeerGroup extends PeerGroup {
 
         return linkupServer;
     }
-
-    getAccountDevicesPeerSource() : PeerSource {
-        return new AccountDevicePeers(this);
-    }
-    
-
 }
 
 class AccountDevicePeers implements PeerSource {
 
-    devicesPeerGroup: DevicesPeerGroup;
+    devicesPeerGroup: AccountDevices;
 
-    constructor(devicesPeerGroup: DevicesPeerGroup) {
+    constructor(devicesPeerGroup: AccountDevices) {
         this.devicesPeerGroup = devicesPeerGroup;
     }
 
@@ -127,4 +126,4 @@ class AccountDevicePeers implements PeerSource {
 }
 
 
-export { DevicesPeerGroup };
+export { AccountDevices as AccountDevices };

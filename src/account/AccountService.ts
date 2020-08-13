@@ -1,30 +1,56 @@
-import { Resources } from 'hyper-hyper-space';
-import { DevicesPeerGroup } from './peers/DevicesPeerGroup';
+import { Resources, Hash } from 'hyper-hyper-space';
+import { AccountDevices } from './peers/AccountDevices';
 import { SharedNamespace } from '../sync/SharedNamespace';
+import { PeerGroup } from '../sync/PeerGroup';
+
+/* AccountsService: Creates a peer group amoung all the account devices,
+                    uses it to sync the set of devices itself.
+
+                    Other modules may use the syncSharedNamespace method to
+                    have per-account shared and synchronized data.
+
+ */
 
 
 class AccountService {
 
+    ownerIdentityHash: Hash;
+    localDeviceHash?: Hash;
+
     resources?: Resources;
 
-    devicesPeerGroup?: DevicesPeerGroup;
+    accountDevices?: AccountDevices;
+
+    started = false;
+
+    constructor(ownerIdentityHash: Hash, localDeviceHash?: Hash) {
+        this.ownerIdentityHash = ownerIdentityHash;
+        this.localDeviceHash   = localDeviceHash;
+    }
 
     async init(resources: Resources) {
 
         if (resources === undefined) {
             this.resources = resources;
-            this.devicesPeerGroup = new DevicesPeerGroup();
-            await this.devicesPeerGroup.init(resources);
-            this.devicesPeerGroup.addSyncTarget(this.devicesPeerGroup.deviceInfo);
+            this.accountDevices = new AccountDevices(this.ownerIdentityHash, this.localDeviceHash);
+            await this.accountDevices.init(resources);
+            this.accountDevices.addSyncTarget(this.accountDevices.deviceInfo);
         }
     }
 
     start() {
-        this.devicesPeerGroup.connect();
+
+        if (!this.started) {
+            this.accountDevices.connect();
+            this.started = true;
+        }
+        
     }
 
     syncSharedNamespace(namespace: SharedNamespace) {
-        this.devicesPeerGroup.addSyncTarget(namespace);
+        this.accountDevices.addSyncTarget(namespace);
     }
 
 }
+
+export { AccountService };
