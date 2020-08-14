@@ -1,9 +1,11 @@
-import { Hash, Resources, Identity } from "hyper-hyper-space";
-import { AccountService } from "../account/AccountService";
-import { ContactsInfo } from "./shared/ContactsInfo";
-import { ContactPairDevices } from "./peers/ContactPairDevices";
-import { AccountDevices } from "../account/peers/AccountDevices";
+import { Hash, Resources, Identity, MutableSet} from 'hyper-hyper-space';
 
+import { AccountService } from '../account/AccountService';
+import { AccountDevices } from '../account/peers/AccountDevices';
+
+import { ContactsInfo } from './shared/ContactsInfo';
+import { ContactPairDevices } from './peers/ContactPairDevices';
+import { AccountDevicesInfo } from 'account/shared/AccountDevicesInfo';
 
 class ContactsService {
 
@@ -20,9 +22,12 @@ class ContactsService {
         this.ownAccountService = ownAccountService;
 
         this.contactsInfo = new ContactsInfo(this.ownAccountService.ownerIdentityHash);
+
+        this.allContactPairDevices = new Map();
     }
 
     async init(resources: Resources) {
+
         this.contactsInfo.init(resources);
 
         for (const mut of this.contactsInfo.getAllObjects()) {
@@ -36,9 +41,11 @@ class ContactsService {
             }
         };
 
-        this.contactsInfo.contacts.onAddition(onNewContact);
+        this.contactsInfo?.contacts?.onAddition(onNewContact);
        
-        for (const contactIdentity of this.contactsInfo.contacts.values()) {
+        const contacts = this.contactsInfo.contacts as MutableSet<Identity>;
+
+        for (const contactIdentity of contacts.values()) {
             onNewContact(contactIdentity);
         }
 
@@ -69,10 +76,16 @@ class ContactsService {
                 this.allContactPairDevices.get(contactIdentityHash) as ContactPairDevices;
         
         contactPairDevices.connect();
-        contactPairDevices.addSyncTarget(this.ownAccountService.accountDevices.deviceInfo);
-        contactPairDevices.addSyncTarget(contactPairDevices.contactAccountDevices.deviceInfo);
+        contactPairDevices.addSyncTarget(this.ownAccountService?.accountDevices?.deviceInfo as AccountDevicesInfo);
+        contactPairDevices.addSyncTarget(contactPairDevices.contactAccountDevices?.deviceInfo as AccountDevicesInfo);
 
+    }
+
+    createInvite(recipient: string) {
+        recipient;
     }
 
 
 }
+
+export { ContactsService };

@@ -1,4 +1,4 @@
-import { Hash, PeerGroupInfo, Resources, Identity, PeerInfo, MutableSet, SharedNamespace, LinkupManager, PeerSource, Shuffle } from 'hyper-hyper-space';
+import { Hash, Resources, PeerInfo, LinkupManager, PeerSource, Shuffle } from 'hyper-hyper-space';
 import { PeerGroup } from '../../sync/PeerGroup';
 
 import { AccountDevicesInfo } from '../shared/AccountDevicesInfo';
@@ -72,11 +72,11 @@ class AccountDevices extends PeerGroup {
     }
     
     async getPeerSource() : Promise<PeerSource> {
-        return this.peerSource;
+        return this.peerSource as PeerSource;
     }
 
     getLinkupServer(): string {
-        let linkupServers = Array.from(this.deviceInfo.getLinkupServers().values());
+        let linkupServers = Array.from((this.deviceInfo as AccountDevicesInfo).getLinkupServers().values());
 
         let linkupServer = LinkupManager.defaultLinkupServer;
 
@@ -97,8 +97,8 @@ class AccountDevicePeers implements PeerSource {
     }
 
     async getPeers(count: number): Promise<PeerInfo[]> {
-        
-        let devices = Array.from(this.devicesPeerGroup.deviceInfo.getDevices().values());
+
+        let devices = Array.from((this.devicesPeerGroup.deviceInfo as AccountDevicesInfo).getDevices().values());
         Shuffle.array(devices);
 
         if (devices.length > count) {
@@ -112,7 +112,7 @@ class AccountDevicePeers implements PeerSource {
     async getPeerForEndpoint(endpoint: string): Promise<PeerInfo | undefined> {
         let hash = Device.deviceHashFromEndpoint(endpoint);
 
-        let device = this.devicesPeerGroup.deviceInfo.getDevices().get(hash);
+        let device = (this.devicesPeerGroup.deviceInfo as AccountDevicesInfo).getDevices().get(hash);
 
         let pi = undefined;
 

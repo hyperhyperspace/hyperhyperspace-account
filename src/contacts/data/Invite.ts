@@ -1,4 +1,4 @@
-import { HashedObject, Hash, Identity, HashReference, HashedSet, RNGImpl } from 'hyper-hyper-space';
+import { HashedObject, Identity } from 'hyper-hyper-space';
 import { Device } from '../../account/data/Device';
 import { InviteToken } from './InviteToken';
 
@@ -8,10 +8,10 @@ class Invite extends HashedObject {
 
     static className = 'hhs-home/v0/Invite';
 
-    token               : InviteToken;
+    token?              : InviteToken;
 
     intendedRecipient?  : string;
-    timestamp           : number;
+    timestamp?          : number;
 
     constructor(sender?: Identity, devices?: IterableIterator<Device>, recipient?: string) {
         super();

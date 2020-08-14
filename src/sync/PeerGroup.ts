@@ -1,4 +1,4 @@
-import { PeerGroupInfo, Resources, Mesh, PeerInfo, PeerSource } from 'hyper-hyper-space';
+import { PeerGroupInfo, Resources, PeerInfo, PeerSource } from 'hyper-hyper-space';
 import { SharedNamespace } from './SharedNamespace';
 
 

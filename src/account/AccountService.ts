@@ -1,7 +1,7 @@
 import { Resources, Hash } from 'hyper-hyper-space';
 import { AccountDevices } from './peers/AccountDevices';
 import { SharedNamespace } from '../sync/SharedNamespace';
-import { PeerGroup } from '../sync/PeerGroup';
+import { AccountDevicesInfo } from './shared/AccountDevicesInfo';
 
 /* AccountsService: Creates a peer group amoung all the account devices,
                     uses it to sync the set of devices itself.
@@ -34,21 +34,30 @@ class AccountService {
             this.resources = resources;
             this.accountDevices = new AccountDevices(this.ownerIdentityHash, this.localDeviceHash);
             await this.accountDevices.init(resources);
-            this.accountDevices.addSyncTarget(this.accountDevices.deviceInfo);
+            this.accountDevices.addSyncTarget(this.accountDevices.deviceInfo as AccountDevicesInfo);
         }
     }
 
     start() {
 
+        if (this.resources === undefined) {
+            throw new Error('AccountService needs to be initialized before start can be invoked.');
+        }
+
         if (!this.started) {
-            this.accountDevices.connect();
+            this.accountDevices?.connect();
             this.started = true;
         }
         
     }
 
     syncSharedNamespace(namespace: SharedNamespace) {
-        this.accountDevices.addSyncTarget(namespace);
+
+        if (this.resources === undefined) {
+            throw new Error('AccountService needs to be initialized before syncSharedNamespace can be invoked.');
+        }
+
+        this.accountDevices?.addSyncTarget(namespace);
     }
 
 }

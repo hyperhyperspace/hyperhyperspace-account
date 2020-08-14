@@ -20,7 +20,7 @@ class InviteToken extends HashedObject {
         if (sender !== undefined) {
             this.secret = new RNGImpl().randomHexString(BITS_FOR_SECRET);
 
-            const deviceReferences = Array.from(devices).map((d: Device) => d.createReference()).values();
+            const deviceReferences = Array.from(devices as IterableIterator<Device>).map((d: Device) => d.createReference()).values();
             
             this.senderIdentityHash = sender.hash();
             this.senderInfo         = sender.info;
@@ -34,7 +34,8 @@ class InviteToken extends HashedObject {
     }
 
     toToken() {
-        let deviceHashes = Array.from(this.senderDevices.values()).map((d: HashReference<Device>) => d.hash);
+        const devices = this.senderDevices as HashedSet<HashReference<Device>>;
+        let deviceHashes = Array.from(devices.values()).map((d: HashReference<Device>) => d.hash);
         return JSON.stringify({ s: this.senderIdentityHash, sec: this.secret, i: this.senderInfo, d: deviceHashes, l: this.senderLinkup });
     }
 
@@ -64,8 +65,11 @@ class InviteToken extends HashedObject {
     getSenderPeers() : PeerInfo[] {
         let peers: PeerInfo[] = [];
 
-        for (const deviceRef of this.senderDevices.values()) {
-            let ep = Device.endpointForDeviceHash(deviceRef.hash, this.senderLinkup);
+        const devices = this.senderDevices as HashedSet<HashReference<Device>>;
+
+        for (const deviceRef of devices.values()) {
+            let ep = Device.endpointForDeviceHash(deviceRef.hash, this.senderLinkup as string);
+            peers.push({endpoint: ep, identityHash: this.senderIdentityHash});
         }
 
         return peers;
@@ -84,8 +88,9 @@ class InviteToken extends HashedObject {
 
         if (deviceHash !== undefined) {
             let deviceRef = new HashReference(deviceHash, Device.className);
-            if (this.senderDevices.has(deviceRef)) {
-                pi = { endpoint: Device.endpointForDeviceHash(deviceHash, this.senderLinkup), identityHash: this.senderIdentityHash }
+            const devices = this.senderDevices as HashedSet<HashReference<Device>>;
+            if (devices.has(deviceRef)) {
+                pi = { endpoint: Device.endpointForDeviceHash(deviceHash, this.senderLinkup as string), identityHash: this.senderIdentityHash }
             }
         }
 
@@ -94,18 +99,18 @@ class InviteToken extends HashedObject {
     }
 
     getReceiverPeer(receiverIdentity: Identity) : PeerInfo {
-        let ep = this.senderLinkup;
+        let ep = this.senderLinkup as string;
         if (!ep.endsWith('/')) {
             ep = ep + '/';
         }
 
         const receiverIdentityHash = receiverIdentity.hash();
-        ep = ep + 'invite-reply/' + receiverIdentityHash + '/' + new HMACImpl().hmacSHA256hex(receiverIdentityHash, this.secret);
+        ep = ep + 'invite-reply/' + receiverIdentityHash + '/' + new HMACImpl().hmacSHA256hex(receiverIdentityHash, this.secret as string);
 
         return { endpoint: ep, identityHash: receiverIdentityHash};
     }
 
-    parseReceiverPeer(ep: Endpoint) : PeerInfo | undefined {
+    parseReceiverEndpoint(ep: Endpoint) : PeerInfo | undefined {
         let parts = ep.split('/invite-reply/');
         if (parts.length !== 2) {
             return undefined;
@@ -117,7 +122,7 @@ class InviteToken extends HashedObject {
             return undefined;
         }
 
-        if (parts[1] === new HMACImpl().hmacSHA256hex(parts[0], this.secret)) {
+        if (parts[1] === new HMACImpl().hmacSHA256hex(parts[0], this.secret as string)) {
             return { endpoint: ep, identityHash: parts[0] }
         } else {
             return undefined;

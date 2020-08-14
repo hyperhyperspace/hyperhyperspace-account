@@ -1,4 +1,4 @@
-import { Resources, MutableObject, Hash, Namespace, MutableReference, Identity } from 'hyper-hyper-space';
+import { Resources, MutableObject, Namespace, MutableReference, Identity } from 'hyper-hyper-space';
 
 import { SharedNamespace } from '../../sync/SharedNamespace';
 
@@ -37,7 +37,7 @@ class PendingInviteInfo implements SharedNamespace {
 
     }
 
-    get(name: string): MutableObject {
+    get(name: string): MutableObject | undefined {
         return this.namespace.get(name);
     }
 

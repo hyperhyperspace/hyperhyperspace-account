@@ -60,7 +60,7 @@ class ContactsInfo implements SharedNamespace {
 
     }
 
-    get(name: string): MutableObject {
+    get(name: string): MutableObject | undefined {
         return this.namespace?.get(name);
     }
 
