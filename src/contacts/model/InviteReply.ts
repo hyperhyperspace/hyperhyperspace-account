@@ -1,4 +1,5 @@
 import { HashedObject, Identity } from 'hyper-hyper-space';
+import { HMACImpl } from 'hyper-hyper-space';
 
 
 class InviteReply extends HashedObject {
@@ -7,6 +8,16 @@ class InviteReply extends HashedObject {
 
     receiverIdentity?: Identity;
     hmac?: string;
+
+    constructor(receiverIdentity?: Identity, secret?: string) {
+        super();
+
+        if (receiverIdentity !== undefined) {
+            this.receiverIdentity = receiverIdentity;
+            this.hmac = new HMACImpl().hmacSHA256hex(this.receiverIdentity?.hash(), secret as string);
+        }
+
+    }
 
     init(): void {
         

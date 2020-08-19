@@ -1,5 +1,5 @@
 import { HashedObject, Identity } from 'hyper-hyper-space';
-import { Device } from '../../account/data/Device';
+import { Device } from '../../account/model/Device';
 import { InviteToken } from './InviteToken';
 
 

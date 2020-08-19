@@ -1,26 +1,26 @@
-import { Hash, Resources, PeerInfo, PeerSource, JoinPeerSources } from 'hyper-hyper-space';
+import { Hash, Resources } from 'hyper-hyper-space';
 
-import { PeerGroup } from '../../sync/PeerGroup';
+import { PeerInfo, PeerSource, JoinPeerSources, PeerGroup } from 'hyper-hyper-space';
 
-import { AccountDevices } from '../../account/peers/AccountDevices';
+import { AccountDevicesPeerGroup } from '../../account/peers/AccountDevicesPeerGroup';
 
 
-class ContactPairDevices extends PeerGroup {
+class ContactPairDevicesPeerGroup extends PeerGroup {
 
-    ownAccountDevices   : AccountDevices;
+    ownPeerGroup   : AccountDevicesPeerGroup;
     contactIdentityHash : Hash;
 
     resources?: Resources;
 
-    contactAccountDevices?: AccountDevices;
+    contactPeerGroup?: AccountDevicesPeerGroup;
 
     peerGroupId? : string;
     peerSource?  : PeerSource; 
 
-    constructor(ownAccountDevices: AccountDevices, contactIdentityHash: Hash) {
+    constructor(ownPeerGroup: AccountDevicesPeerGroup, contactIdentityHash: Hash) {
         super();
 
-        this.ownAccountDevices = ownAccountDevices;
+        this.ownPeerGroup = ownPeerGroup;
         this.contactIdentityHash = contactIdentityHash;
     }
 
@@ -28,7 +28,7 @@ class ContactPairDevices extends PeerGroup {
 
         this.resources = resources;
 
-        let identityHashes = [this.ownAccountDevices.ownerIdentityHash,
+        let identityHashes = [this.ownPeerGroup.ownerIdentityHash,
                               this.contactIdentityHash];
 
         identityHashes.sort();
@@ -37,12 +37,16 @@ class ContactPairDevices extends PeerGroup {
                            identityHashes[0] + '-' +
                            identityHashes[1] + '-devices';
 
-        this.contactAccountDevices = new AccountDevices(this.contactIdentityHash);
-        await this.contactAccountDevices.init(resources);
+        this.contactPeerGroup = new AccountDevicesPeerGroup(this.contactIdentityHash);
+        await this.contactPeerGroup.init(resources);
         
-        this.peerSource = new JoinPeerSources([await this.ownAccountDevices.getPeerSource(),
-                                               await this.contactAccountDevices.getPeerSource()]);
+        this.peerSource = new JoinPeerSources([await this.ownPeerGroup.getPeerSource(),
+                                               await this.contactPeerGroup.getPeerSource()]);
 
+    }
+
+    async deinit() {
+        await this.contactPeerGroup?.deinit();
     }
 
     getResources(): Resources {
@@ -63,7 +67,7 @@ class ContactPairDevices extends PeerGroup {
     }
 
     getLocalPeer(): Promise<PeerInfo> {
-        return this.ownAccountDevices.getLocalPeer();
+        return this.ownPeerGroup.getLocalPeer();
     }
 
     async getPeerSource(): Promise<PeerSource> {
@@ -79,4 +83,4 @@ class ContactPairDevices extends PeerGroup {
 
 }
 
-export { ContactPairDevices };
+export { ContactPairDevicesPeerGroup };
