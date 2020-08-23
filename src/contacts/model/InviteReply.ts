@@ -1,5 +1,5 @@
-import { HashedObject, Identity } from 'hyper-hyper-space';
-import { HMACImpl } from 'hyper-hyper-space';
+import { HashedObject, Identity } from 'hhs';
+import { HMACImpl } from 'hhs';
 
 
 class InviteReply extends HashedObject {

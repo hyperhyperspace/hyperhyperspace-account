@@ -1,6 +1,6 @@
-import { Hash, Resources } from 'hyper-hyper-space';
+import { Hash, Resources } from 'hhs';
 
-import { PeerInfo, PeerSource, JoinPeerSources, PeerGroup } from 'hyper-hyper-space';
+import { PeerInfo, PeerSource, JoinPeerSources, PeerGroup } from 'hhs';
 
 import { AccountDevicesPeerGroup } from '../../account/peers/AccountDevicesPeerGroup';
 

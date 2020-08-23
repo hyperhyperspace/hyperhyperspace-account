@@ -1,4 +1,4 @@
-import { Hash, Resources, Identity, MutableSet, HashedObject, SyncMode} from 'hyper-hyper-space';
+import { Hash, Resources, Identity, MutableSet, HashedObject, SyncMode} from 'hhs';
 
 import { AccountDevicesSync } from '../../account/sync/AccountDevicesSync';
 import { AccountDevicesPeerGroup } from '../../account/peers/AccountDevicesPeerGroup';

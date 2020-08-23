@@ -1,8 +1,8 @@
-import { Identity } from 'hyper-hyper-space';
-import { Hashing, Hash } from 'hyper-hyper-space';
-import { HashedObject, HashedSet } from 'hyper-hyper-space';
-import { HashReference, MutableReference } from 'hyper-hyper-space';
-import { RNGImpl } from 'hyper-hyper-space';
+import { Identity } from 'hhs';
+import { Hashing, Hash } from 'hhs';
+import { HashedObject, HashedSet } from 'hhs';
+import { HashReference, MutableReference } from 'hhs';
+import { RNGImpl } from 'hhs';
 
 import { Device } from '../../account/model/Device';
 

@@ -1,4 +1,4 @@
-import { Identity, MutableSet, HashedObject, Resources } from 'hyper-hyper-space';
+import { Identity, MutableSet, HashedObject, Resources } from 'hhs';
 
 import { Device } from './Device';
 import { LinkupServer } from './LinkupServer';

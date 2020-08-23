@@ -1,9 +1,9 @@
 
-import { Hashing, Identity} from 'hyper-hyper-space';
-import { PeerGroup, PeerSource, PeerInfo, Endpoint } from 'hyper-hyper-space';
-import { Hash, HashReference, HashedSet } from 'hyper-hyper-space';
-import { HMACImpl } from 'hyper-hyper-space';
-import { Resources } from 'hyper-hyper-space';
+import { Hashing, Identity} from 'hhs';
+import { PeerGroup, PeerSource, PeerInfo, Endpoint } from 'hhs';
+import { Hash, HashReference, HashedSet } from 'hhs';
+import { HMACImpl } from 'hhs';
+import { Resources } from 'hhs';
 
 import { InviteToken } from '../model/InviteToken';
 import { AccountDevicesPeerGroup } from '../../account/peers/AccountDevicesPeerGroup';
@@ -50,7 +50,7 @@ class PendingInviteDevicesPeerGroup extends PeerGroup {
     }
 
     async deinit() {
-        
+
     }
 
     isSender() {

@@ -1,4 +1,4 @@
-import { Resources, Hash, HashedObject, SyncMode, Mesh } from 'hyper-hyper-space';
+import { Resources, Hash, HashedObject, SyncMode, Mesh } from 'hhs';
 import { AccountDevicesPeerGroup } from '../peers/AccountDevicesPeerGroup';
 
 

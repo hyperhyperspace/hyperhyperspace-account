@@ -1,4 +1,4 @@
-import { Resources, MutableSet, Identity, HashedObject } from 'hyper-hyper-space';
+import { Resources, MutableSet, Identity, HashedObject } from 'hhs';
 
 import { Invite } from '../model/Invite';
 import { InviteToken } from '../model/InviteToken';

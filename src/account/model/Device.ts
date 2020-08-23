@@ -1,4 +1,4 @@
-import { HashedObject, Hash, Identity, Endpoint, PeerInfo } from 'hyper-hyper-space';
+import { HashedObject, Hash, Identity, Endpoint, PeerInfo } from 'hhs';
 
 class Device extends HashedObject {
 

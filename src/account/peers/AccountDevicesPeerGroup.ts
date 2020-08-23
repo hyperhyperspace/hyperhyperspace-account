@@ -1,5 +1,5 @@
-import { Hash, Resources, Shuffle } from 'hyper-hyper-space';
-import { PeerInfo, LinkupManager, PeerSource, PeerGroup } from 'hyper-hyper-space';
+import { Hash, Resources, Shuffle } from 'hhs';
+import { PeerInfo, LinkupManager, PeerSource, PeerGroup } from 'hhs';
 
 import { AccountDevices } from '../model/AccountDevices';
 import { Device } from '../model/Device';

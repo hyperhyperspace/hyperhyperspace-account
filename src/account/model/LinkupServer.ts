@@ -1,4 +1,4 @@
-import { HashedObject } from 'hyper-hyper-space';
+import { HashedObject } from 'hhs';
 
 
 class LinkupServer extends HashedObject {
