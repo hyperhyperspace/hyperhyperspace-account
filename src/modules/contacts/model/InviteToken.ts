@@ -4,7 +4,7 @@ import { HashedObject, HashedSet } from 'hhs';
 import { HashReference, MutableReference } from 'hhs';
 import { RNGImpl } from 'hhs';
 
-import { Device } from '../../account/model/Device';
+import { Device } from 'modules/device-cloud';
 
 import { InviteReply } from './InviteReply';
 

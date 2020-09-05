@@ -1,11 +1,11 @@
 import { Hash, Resources, Shuffle } from 'hhs';
 import { PeerInfo, LinkupManager, PeerSource, PeerGroup } from 'hhs';
 
-import { AccountDevices } from '../model/AccountDevices';
+import { OwnDevices } from '../model/OwnDevices';
 import { Device } from '../model/Device';
 
 
-class AccountDevicesPeerGroup extends PeerGroup {
+class DeviceCloudPeerGroup extends PeerGroup {
 
 
     ownerIdentityHash: Hash;
@@ -15,7 +15,7 @@ class AccountDevicesPeerGroup extends PeerGroup {
     peerGroupId : string;
     peerSource?  : PeerSource;
 
-    accountDevices?: AccountDevices;
+    ownDevices?: OwnDevices;
 
 
     constructor(ownerIdentityHash: Hash, localDeviceHash?: Hash) {
@@ -35,25 +35,25 @@ class AccountDevicesPeerGroup extends PeerGroup {
 
         let owner = await resources.store.load(this.ownerIdentityHash);
 
-        this.accountDevices = new AccountDevices(owner);
+        this.ownDevices = new OwnDevices(owner);
 
-        this.accountDevices.setResources(resources);
+        this.ownDevices.setResources(resources);
  
-        await this.accountDevices.getDevices().loadAndWatchForChanges();
-        await this.accountDevices.getLinkupServers().loadAndWatchForChanges();
+        await this.ownDevices.getDevices().loadAndWatchForChanges();
+        await this.ownDevices.getLinkupServers().loadAndWatchForChanges();
         
-        this.peerSource = new AccountDevicesPeerSource(this);
+        this.peerSource = new OwnDevicesPeerSource(this);
     }
 
     async deinit() {
-        this.accountDevices?.getDevices().watchForChanges(false);
-        this.accountDevices?.getLinkupServers().watchForChanges(false);
+        this.ownDevices?.getDevices().watchForChanges(false);
+        this.ownDevices?.getLinkupServers().watchForChanges(false);
     }
 
     getResources(): Resources {
 
         if (this.resources === undefined) {
-            throw new Error('AccountDevices has not been initialized: resources is undefined.');
+            throw new Error('OwnDevices has not been initialized: resources is undefined.');
         } else {
             return this.resources;
         }
@@ -67,9 +67,9 @@ class AccountDevicesPeerGroup extends PeerGroup {
     async getLocalPeer(): Promise<PeerInfo> {
         
         if (this.resources === undefined) {
-            throw new Error('AccountDevices has not been initialized: localDevicePeer is undefined.');
+            throw new Error('OwnDevices has not been initialized: localDevicePeer is undefined.');
         } else if (this.localDeviceHash === undefined) {
-            throw new Error('This AccountDevices instance does not have a configured local device: localPeer is undefined.');
+            throw new Error('This OwnDevices instance does not have a configured local device: localPeer is undefined.');
         }
 
         const localDevice = await this.getResources().store.load(this.localDeviceHash) as Device;
@@ -81,7 +81,7 @@ class AccountDevicesPeerGroup extends PeerGroup {
     }
 
     getLinkupServer(): string {
-        let linkupServers = Array.from((this.accountDevices as AccountDevices).getLinkupServers().values());
+        let linkupServers = Array.from((this.ownDevices as OwnDevices).getLinkupServers().values());
 
         let linkupServer = LinkupManager.defaultLinkupServer;
 
@@ -93,17 +93,17 @@ class AccountDevicesPeerGroup extends PeerGroup {
     }
 }
 
-class AccountDevicesPeerSource implements PeerSource {
+class OwnDevicesPeerSource implements PeerSource {
 
-    peerGroup: AccountDevicesPeerGroup;
+    peerGroup: DeviceCloudPeerGroup;
 
-    constructor(peerGroup: AccountDevicesPeerGroup) {
+    constructor(peerGroup: DeviceCloudPeerGroup) {
         this.peerGroup = peerGroup;
     }
 
     async getPeers(count: number): Promise<PeerInfo[]> {
 
-        let devices = Array.from((this.peerGroup.accountDevices as AccountDevices).getDevices().values());
+        let devices = Array.from((this.peerGroup.ownDevices as OwnDevices).getDevices().values());
         Shuffle.array(devices);
 
         if (devices.length > count) {
@@ -117,7 +117,7 @@ class AccountDevicesPeerSource implements PeerSource {
     async getPeerForEndpoint(endpoint: string): Promise<PeerInfo | undefined> {
         let hash = Device.deviceHashFromEndpoint(endpoint);
 
-        let device = (this.peerGroup.accountDevices as AccountDevices).getDevices().get(hash);
+        let device = (this.peerGroup.ownDevices as OwnDevices).getDevices().get(hash);
 
         let pi = undefined;
 
@@ -131,4 +131,4 @@ class AccountDevicesPeerSource implements PeerSource {
 }
 
 
-export { AccountDevicesPeerGroup };
+export { DeviceCloudPeerGroup };

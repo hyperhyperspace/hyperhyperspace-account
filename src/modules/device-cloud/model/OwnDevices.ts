@@ -4,7 +4,7 @@ import { Device } from './Device';
 import { LinkupServer } from './LinkupServer';
 
 
-class AccountDevices extends HashedObject {
+class OwnDevices extends HashedObject {
 
     static className = 'hhs-home/v0/AccountDevices';
 
@@ -32,7 +32,7 @@ class AccountDevices extends HashedObject {
     }
 
     getClassName(): string {
-        return AccountDevices.className;
+        return OwnDevices.className;
     }
 
     init(): void {
@@ -80,6 +80,6 @@ class AccountDevices extends HashedObject {
     
 }
 
-HashedObject.registerClass(AccountDevices.className, AccountDevices);
+HashedObject.registerClass(OwnDevices.className, OwnDevices);
 
-export { AccountDevices };
+export { OwnDevices };

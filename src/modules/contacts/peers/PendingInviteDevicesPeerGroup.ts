@@ -5,9 +5,10 @@ import { Hash, HashReference, HashedSet } from 'hhs';
 import { HMACImpl } from 'hhs';
 import { Resources } from 'hhs';
 
+import { DeviceCloudPeerGroup } from 'modules/device-cloud';
+import { Device } from 'modules/device-cloud';
+
 import { InviteToken } from '../model/InviteToken';
-import { AccountDevicesPeerGroup } from '../../account/peers/AccountDevicesPeerGroup';
-import { Device } from '../../account/model/Device';
 
 
 class PendingInviteDevicesPeerGroup extends PeerGroup {
@@ -17,7 +18,7 @@ class PendingInviteDevicesPeerGroup extends PeerGroup {
     private sender?: boolean;
 
     // only present if we are the sender of the invite:
-    senderPeerGroup?: AccountDevicesPeerGroup;
+    senderPeerGroup?: DeviceCloudPeerGroup;
 
     // only present if we are the receiver:
     receiverIdentity?: Identity;
@@ -31,7 +32,7 @@ class PendingInviteDevicesPeerGroup extends PeerGroup {
 
     }
 
-    forInviteSender(senderPeerGroup: AccountDevicesPeerGroup) {
+    forInviteSender(senderPeerGroup: DeviceCloudPeerGroup) {
         
         this.sender = true;
         this.senderPeerGroup  = senderPeerGroup;

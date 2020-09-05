@@ -4,7 +4,7 @@ import { Invite } from '../model/Invite';
 import { InviteToken } from '../model/InviteToken';
 
 
-class Contacts extends HashedObject {
+class OwnContacts extends HashedObject {
 
     static className = 'hhs-home/v0/Contacts';
 
@@ -43,7 +43,7 @@ class Contacts extends HashedObject {
     }
 
     getClassName(): string {
-        return Contacts.className;
+        return OwnContacts.className;
     }
 
     init(): void {
@@ -117,6 +117,6 @@ class Contacts extends HashedObject {
 
 }
 
-HashedObject.registerClass(Contacts.className, Contacts);
+HashedObject.registerClass(OwnContacts.className, OwnContacts);
 
-export { Contacts }
+export { OwnContacts as OwnContacts }

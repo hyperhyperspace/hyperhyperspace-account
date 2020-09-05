@@ -1,5 +1,7 @@
 import { HashedObject, Identity } from 'hhs';
-import { Device } from '../../account/model/Device';
+
+import { Device } from 'modules/device-cloud';
+
 import { InviteToken } from './InviteToken';
 
 

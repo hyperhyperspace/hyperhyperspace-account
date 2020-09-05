@@ -1,23 +1,22 @@
 import { Hash, Resources } from 'hhs';
-
 import { PeerInfo, PeerSource, JoinPeerSources, PeerGroup } from 'hhs';
 
-import { AccountDevicesPeerGroup } from '../../account/peers/AccountDevicesPeerGroup';
+import { DeviceCloudPeerGroup } from 'modules/device-cloud';
 
 
 class ContactPairDevicesPeerGroup extends PeerGroup {
 
-    ownPeerGroup   : AccountDevicesPeerGroup;
+    ownPeerGroup   : DeviceCloudPeerGroup;
     contactIdentityHash : Hash;
 
     resources?: Resources;
 
-    contactPeerGroup?: AccountDevicesPeerGroup;
+    contactPeerGroup?: DeviceCloudPeerGroup;
 
     peerGroupId? : string;
     peerSource?  : PeerSource; 
 
-    constructor(ownPeerGroup: AccountDevicesPeerGroup, contactIdentityHash: Hash) {
+    constructor(ownPeerGroup: DeviceCloudPeerGroup, contactIdentityHash: Hash) {
         super();
 
         this.ownPeerGroup = ownPeerGroup;
@@ -37,7 +36,7 @@ class ContactPairDevicesPeerGroup extends PeerGroup {
                            identityHashes[0] + '-' +
                            identityHashes[1] + '-devices';
 
-        this.contactPeerGroup = new AccountDevicesPeerGroup(this.contactIdentityHash);
+        this.contactPeerGroup = new DeviceCloudPeerGroup(this.contactIdentityHash);
         await this.contactPeerGroup.init(resources);
         
         this.peerSource = new JoinPeerSources([await this.ownPeerGroup.getPeerSource(),

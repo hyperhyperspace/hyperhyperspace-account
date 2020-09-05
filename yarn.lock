@@ -1957,10 +1957,10 @@ hex-color-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/hex-color-regex/-/hex-color-regex-1.1.0.tgz#4c06fccb4602fe2602b3c93df82d7e7dbf1a8a8e"
   integrity sha512-l9sfDFsuqtOqKDsQdqrMRk0U85RZc0RtOR9yPI7mRVOa4FsR/BVnZ0shmQRM96Ji99kYZP/7hn1cedc1+ApsTQ==
 
-"hhs@npm:@hyper-hyper-space/core":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@hyper-hyper-space/core/-/core-0.1.0.tgz#ba338d61a98e809b26dfe58971cda91182617253"
-  integrity sha512-bETYFYB7qRUCvBANlZijDyO+9C9Goba+vUfB7Q1/p8RWP1GFMHj+bIJjqjATFmhE1IT7BLTVL1bcJ8QyQUHreQ==
+"hhs@npm:@hyper-hyper-space/core@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@hyper-hyper-space/core/-/core-0.2.0.tgz#20e5e61e2c024f52756e2f82fcf293c4613e351c"
+  integrity sha512-TMB6Do/yVYGOoL8VNI6eB5e4JwLTvTqvIAKvV2xK/l49iEMgCOdgWHsrEdhrkUq5ZEU/v4/beoT2N676CYQgDg==
   dependencies:
     "@types/node" "^14.0.13"
     chacha-js "^2.1.1"
