@@ -13,7 +13,7 @@ import { PendingInviteDevicesPeerGroup } from './peers/PendingInviteDevicesPeerG
 
 import { Module } from 'util/Module';
 
-class Contacts extends Module {
+class ContactsCloud extends Module {
 
     ownDeviceCloud: DeviceCloud;
 
@@ -207,4 +207,4 @@ class Contacts extends Module {
 
 }
 
-export { Contacts as ContactsSync };
+export { ContactsCloud };
